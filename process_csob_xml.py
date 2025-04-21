@@ -22,7 +22,10 @@ records = []
 
 for finsta05 in root.findall(".//FINSTA05"):
     transaction_date = finsta05.findtext("DPROCD")
-    transaction_value = finsta05.findtext("S61_CASTKA")
+    transaction_value_raw = finsta05.findtext("S61_CASTKA")
+    transaction_value = None
+    if transaction_value_raw:
+        transaction_value = float(transaction_value_raw.replace(",", "."))
     
     record = {
         "transaction date": transaction_date,
