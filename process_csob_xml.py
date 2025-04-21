@@ -1,6 +1,7 @@
 import xml.etree.ElementTree as ET
 import pandas as pd
 from pathlib import Path
+import re
 
 # ==== SETTINGS ====
 input_path = input("Zadaj cestu k XML súboru (pretiahni súbor alebo zadaj cestu): ").strip()
@@ -26,10 +27,19 @@ for finsta05 in root.findall(".//FINSTA05"):
     transaction_value = None
     if transaction_value_raw:
         transaction_value = float(transaction_value_raw.replace(",", "."))
-    
+
+    message = finsta05.findtext("PART_ID1_2")
+    real_transaction_date = None
+    if message:
+        match = re.search(r"\b\d{1,2}\.\d{1,2}\.\d{4}\b", message)
+        if match:
+            day, month, year = match.group(0).split(".")
+            real_transaction_date = f"{year}-{month.zfill(2)}-{day.zfill(2)}"
+
     record = {
         "transaction date": transaction_date,
         "transaction value": transaction_value,
+        "real transaction date": real_transaction_date,
     }
     records.append(record)
 
