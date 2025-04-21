@@ -3,8 +3,10 @@ import pandas as pd
 from pathlib import Path
 
 # ==== SETTINGS ====
-input_file = "path_to_your_xml_file.xml"
-output_file = "output.xlsx"
+input_path = input("Zadaj cestu k XML súboru (pretiahni súbor alebo zadaj cestu): ").strip()
+input_path = input_path.replace('\\', '')
+input_file = Path(input_path)
+output_file = input_file.parent / f"processed_{input_file.stem}.xlsx"
 
 # ==== PROCESS XML ====
 tree = ET.parse(input_file)
