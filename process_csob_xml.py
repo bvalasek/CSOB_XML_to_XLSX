@@ -49,6 +49,16 @@ for finsta05 in root.findall(".//FINSTA05"):
     if original_currency_value_raw:
         original_currency_value = float(original_currency_value_raw.replace(",", "."))
 
+    part_accno = finsta05.findtext("PART_ACCNO")
+    part_bank_id = finsta05.findtext("PART_BANK_ID")
+
+    from_account = ""
+    to_account = ""
+    if trans_type == "income" and part_accno and part_bank_id:
+        from_account = f"{part_accno}/{part_bank_id}"
+    elif trans_type == "outcome" and part_accno and part_bank_id:
+        to_account = f"{part_accno}/{part_bank_id}"
+
     parts = []
     place_cleaned = ""
     if place:
@@ -81,6 +91,8 @@ for finsta05 in root.findall(".//FINSTA05"):
         "type": trans_type,
         "original currency": original_currency,
         "original currency value": original_currency_value,
+        "from_account": from_account,
+        "to_account": to_account,
     }
     records.append(record)
 
