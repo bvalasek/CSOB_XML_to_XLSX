@@ -52,11 +52,20 @@ for finsta05 in root.findall(".//FINSTA05"):
 
     transaction_message = " | ".join(parts)
 
+    place_or_location = ""
+    if account and place:
+        place_or_location = f"{account} {place.strip()}"
+    elif account:
+        place_or_location = account
+    elif place:
+        place_or_location = place.strip()
+
     record = {
         "transaction date": transaction_date,
         "transaction value": transaction_value,
         "real transaction date": real_transaction_date,
         "transaction message": transaction_message,
+        "place or location": place_or_location,
     }
     records.append(record)
 
