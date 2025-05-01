@@ -40,11 +40,13 @@ for finsta05 in root.findall(".//FINSTA05"):
     account = finsta05.findtext("PART_ACC_ID")
 
     parts = []
+    place_cleaned = ""
     if place:
         if "Místo: " in place:
-            parts.append(place.split("Místo: ")[-1].strip())
+            place_cleaned = place.split("Místo: ")[-1].strip()
         else:
-            parts.append(place.strip())
+            place_cleaned = place.strip()
+        parts.append(place_cleaned)
     if message:
         parts.append(message.strip())
     if account:
@@ -53,12 +55,12 @@ for finsta05 in root.findall(".//FINSTA05"):
     transaction_message = " | ".join(parts)
 
     place_or_location = ""
-    if account and place:
-        place_or_location = f"{account} {place.strip()}"
+    if account and place_cleaned:
+        place_or_location = f"{account} {place_cleaned}"
     elif account:
         place_or_location = account
-    elif place:
-        place_or_location = place.strip()
+    elif place_cleaned:
+        place_or_location = place_cleaned
 
     record = {
         "transaction date": transaction_date,
