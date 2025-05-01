@@ -5,7 +5,7 @@ import re
 
 # ==== SETTINGS ====
 input_path = input("Zadaj cestu k XML súboru (pretiahni súbor alebo zadaj cestu): ").strip()
-input_path = input_path.replace('\\', '')
+input_path = input_path.replace('\\', '').strip('"\'')
 input_file = Path(input_path)
 
 # Kontrola prípony súboru
