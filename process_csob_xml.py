@@ -43,6 +43,12 @@ for finsta05 in root.findall(".//FINSTA05"):
     place = finsta05.findtext("PART_ID1_1")
     account = finsta05.findtext("PART_ACC_ID")
 
+    original_currency = finsta05.findtext("ORIG_CURR")
+    original_currency_value_raw = finsta05.findtext("ORIG_AMOUNT")
+    original_currency_value = None
+    if original_currency_value_raw:
+        original_currency_value = float(original_currency_value_raw.replace(",", "."))
+
     parts = []
     place_cleaned = ""
     if place:
@@ -73,6 +79,8 @@ for finsta05 in root.findall(".//FINSTA05"):
         "transaction message": transaction_message,
         "place or location": place_or_location,
         "type": trans_type,
+        "original currency": original_currency,
+        "original currency value": original_currency_value,
     }
     records.append(record)
 
