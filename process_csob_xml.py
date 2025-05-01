@@ -28,6 +28,10 @@ for finsta05 in root.findall(".//FINSTA05"):
     if transaction_value_raw:
         transaction_value = float(transaction_value_raw.replace(",", "."))
 
+    trans_type = ""
+    if transaction_value is not None:
+        trans_type = "income" if transaction_value > 0 else "outcome"
+
     message = finsta05.findtext("PART_ID1_2")
     real_transaction_date = None
     if message:
@@ -68,6 +72,7 @@ for finsta05 in root.findall(".//FINSTA05"):
         "real transaction date": real_transaction_date,
         "transaction message": transaction_message,
         "place or location": place_or_location,
+        "type": trans_type,
     }
     records.append(record)
 
