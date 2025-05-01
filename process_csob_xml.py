@@ -36,10 +36,27 @@ for finsta05 in root.findall(".//FINSTA05"):
             day, month, year = match.group(0).split(".")
             real_transaction_date = f"{year}-{month.zfill(2)}-{day.zfill(2)}"
 
+    place = finsta05.findtext("PART_ID1_1")
+    account = finsta05.findtext("PART_ACC_ID")
+
+    parts = []
+    if place:
+        if "Místo: " in place:
+            parts.append(place.split("Místo: ")[-1].strip())
+        else:
+            parts.append(place.strip())
+    if message:
+        parts.append(message.strip())
+    if account:
+        parts.append(account.strip())
+
+    transaction_message = " | ".join(parts)
+
     record = {
         "transaction date": transaction_date,
         "transaction value": transaction_value,
         "real transaction date": real_transaction_date,
+        "transaction message": transaction_message,
     }
     records.append(record)
 
