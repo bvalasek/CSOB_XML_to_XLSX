@@ -15,6 +15,14 @@ if input_file.suffix.lower() != ".xml":
 
 output_file = input_file.parent / f"processed_{input_file.stem}.xlsx"
 
+# ==== CATEGORY RULES ====
+CATEGORY_RULES = {
+    "Personal Loans": ["lesia dmytrenko"],
+    "Gifts": ["manufaktura"],
+    "Subscriptions": ["apple.com", "youtubepremium"],
+    "Income": ["dulovic michal"],
+}
+
 # ==== HELPER FUNCTIONS ====
 def translate_payment_type(cz_type):
     if not cz_type:
@@ -46,14 +54,9 @@ def translate_payment_type(cz_type):
 
 def categorize_transaction(text):
     text = text.lower()
-    if "lesia dmytrenko" in text:
-        return "Personal Loans"
-    if "manufaktura" in text:
-        return "Gifts"
-    if "apple.com" in text or "youtubepremium" in text:
-        return "Subscriptions"
-    if "dulovic michal" in text:
-        return "Income"
+    for category, keywords in CATEGORY_RULES.items():
+        if any(keyword in text for keyword in keywords):
+            return category
     return "Other"
 
 # ==== PROCESS XML ====
