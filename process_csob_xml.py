@@ -17,16 +17,32 @@ output_file = input_file.parent / f"processed_{input_file.stem}.xlsx"
 
 # ==== HELPER FUNCTION ====
 def translate_payment_type(cz_type):
-    translations = {
-        "Odchozí úhrada": "Outgoing payment",
-        "Příchozí úhrada": "Incoming payment",
-        "Trvalý příkaz": "Standing order",
-        "Inkaso": "Direct debit",
-        "Platba kartou": "Card payment",
-        "Výběr z bankomatu": "ATM withdrawal",
-        "Nezpoplatněný trvalý převod 358": "Internal transfer (non-charged)",
-    }
-    return translations.get(cz_type, cz_type)
+    if not cz_type:
+        return ""
+
+    cz_type = cz_type.strip()
+
+    partial_translations = [
+        ("Odchozí úhrada SEPA", "SEPA outgoing payment"),
+        ("Odchozí úhrada okamžitá", "Instant outgoing payment"),
+        ("Odchozí úhrada", "Outgoing payment"),
+        ("Příchozí úhrada kartou", "Card incoming payment"),
+        ("Příchozí úhrada", "Incoming payment"),
+        ("Trvalý příkaz", "Standing order"),
+        ("Inkaso", "Direct debit"),
+        ("Platba kartou", "Card payment"),
+        ("Transakce platební kartou", "Card transaction"),
+        ("Výběr z bankomatu", "ATM withdrawal"),
+        ("ČSOB Drobné", "ČSOB micro rounding"),
+        ("Nákup podílových listů", "Mutual fund purchase"),
+        ("Nezpoplatněný trvalý převod", "Internal transfer (non-charged)"),
+    ]
+
+    for cz_pattern, en_translation in partial_translations:
+        if cz_pattern in cz_type:
+            return en_translation
+
+    return cz_type  # fallback
 
 # ==== PROCESS XML ====
 tree = ET.parse(input_file)
