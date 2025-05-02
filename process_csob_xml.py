@@ -15,7 +15,7 @@ if input_file.suffix.lower() != ".xml":
 
 output_file = input_file.parent / f"processed_{input_file.stem}.xlsx"
 
-# ==== HELPER FUNCTION ====
+# ==== HELPER FUNCTIONS ====
 def translate_payment_type(cz_type):
     if not cz_type:
         return ""
@@ -43,6 +43,18 @@ def translate_payment_type(cz_type):
             return en_translation
 
     return cz_type  # fallback
+
+def categorize_transaction(text):
+    text = text.lower()
+    if "lesia dmytrenko" in text:
+        return "Personal Loans"
+    if "manufaktura" in text:
+        return "Gifts"
+    if "apple.com" in text or "youtubepremium" in text:
+        return "Subscriptions"
+    if "dulovic michal" in text:
+        return "Income"
+    return "Other"
 
 # ==== PROCESS XML ====
 tree = ET.parse(input_file)
@@ -114,6 +126,8 @@ for finsta05 in root.findall(".//FINSTA05"):
     elif place_cleaned:
         place_or_location = place_cleaned
 
+    category = categorize_transaction(transaction_message)
+
     record = {
         "transaction date": transaction_date,
         "transaction value": transaction_value,
@@ -126,6 +140,7 @@ for finsta05 in root.findall(".//FINSTA05"):
         "from_account": from_account,
         "to_account": to_account,
         "payment type": payment_type_en,
+        "category": category,
     }
     records.append(record)
 
