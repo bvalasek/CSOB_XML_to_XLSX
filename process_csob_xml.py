@@ -15,6 +15,19 @@ if input_file.suffix.lower() != ".xml":
 
 output_file = input_file.parent / f"processed_{input_file.stem}.xlsx"
 
+# ==== HELPER FUNCTION ====
+def translate_payment_type(cz_type):
+    translations = {
+        "Odchozí úhrada": "Outgoing payment",
+        "Příchozí úhrada": "Incoming payment",
+        "Trvalý příkaz": "Standing order",
+        "Inkaso": "Direct debit",
+        "Platba kartou": "Card payment",
+        "Výběr z bankomatu": "ATM withdrawal",
+        "Nezpoplatněný trvalý převod 358": "Internal transfer (non-charged)",
+    }
+    return translations.get(cz_type, cz_type)
+
 # ==== PROCESS XML ====
 tree = ET.parse(input_file)
 root = tree.getroot()
@@ -59,6 +72,9 @@ for finsta05 in root.findall(".//FINSTA05"):
     elif trans_type == "outcome" and part_accno and part_bank_id:
         to_account = f"{part_accno}/{part_bank_id}"
 
+    payment_type_cz = finsta05.findtext("S61_POST_NAR")
+    payment_type_en = translate_payment_type(payment_type_cz)
+
     parts = []
     place_cleaned = ""
     if place:
@@ -93,6 +109,7 @@ for finsta05 in root.findall(".//FINSTA05"):
         "original currency value": original_currency_value,
         "from_account": from_account,
         "to_account": to_account,
+        "payment type": payment_type_en,
     }
     records.append(record)
 
