@@ -18,9 +18,25 @@ output_file = input_file.parent / f"processed_{input_file.stem}.xlsx"
 # ==== CATEGORY RULES ====
 CATEGORY_RULES = {
     "Personal Loans": ["lesia dmytrenko"],
-    "Gifts": ["manufaktura"],
-    "Subscriptions": ["apple.com", "youtubepremium"],
-    "Income": ["dulovic michal"],
+    "Gifts": ["manufaktura", "dar", "donio"],
+    "Subscriptions": ["apple.com", "youtubepremium", "spotify", "budgetbakers", "chatgpt"],
+    "Income": ["dulovic michal", "infor"],
+    "Internal transfers": ["258867701/0300", "296660584/0300", "1522916037/3030", "revolut"],
+    "Groceries": ["tesco", "lidl", "albert", "billa", "rohlik", "košík", "kaufland", "spar", "penny", "coop", "potraviny", "paul"],
+    "Transport": ["čd", "pmdp", "bolt", "uber"],
+    "Dining": ["bbdomu", "mcdonald", "restaurace", "bistro", "kfc", "nesnezeno", "toogoodtogo", "pizza", "kebab", "jidelna", "beas", "dhaba", "pivstro", "fior di", "country life", "loving hut", "obederie"],
+    "Cafe (Study)": ["barcelounoc", "skautský", "cafe neustadt", "camp"],
+    "Cafe (Drinks)": ["friends bar", "lod riverside", "elpicko", "qcafe"],
+    "Bills": ["nájom", "elektrina", "plyn", "voda", "čez", "e.on", "pre", "yello", "mnd", "ppas"],
+    "Personal Care": ["dm", "rossmann", "teta", "drogerie", "kaderníctvo", "barber"],
+    "Medical bills": ["lekáreň", "doktor", "fyzioterapia", "dr. max"],
+    "Housing": ["ikea", "jysk", "bauhaus", "alza", "obi", "datart", "temu"],
+    "Clothing": ["hm", "lindex", "reserved", "new yorker", "3someconcept"],
+    "Insurance": ["pojišťovna", "životní pojištění"],
+    "Sport and Culture": ["vstupenky", "goout", "decathlon", "kino", "divadlo", "závody", "cinema city"],
+    "Telecommunication": ["o2", "vodafone", "upc"],
+    "ATM Withdrawals": ["atm", "ac01", "csas", "kb atm"],
+    "Investments": ["čsob drobné", "edward", "bohatství"]
 }
 
 # ==== HELPER FUNCTIONS ====
