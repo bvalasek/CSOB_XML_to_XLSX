@@ -6,7 +6,8 @@ on:
       - main
   pull_request:
     types: [opened, reopened, synchronize]
-
+  workflow_dispatch:  # ← umožní manuálne spustenie z GitHub UI
+  
 permissions:
   contents: write
   issues: read
