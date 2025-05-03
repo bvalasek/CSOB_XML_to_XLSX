@@ -13,7 +13,9 @@ if input_file.suffix.lower() != ".xml":
     print("Error: Musíš zadať XML súbor!")
     exit(1)
 
-output_file = input_file.parent / f"processed_{input_file.stem}.xlsx"
+output_base = input_file.parent / f"processed_{input_file.stem}"
+output_excel = output_base.with_suffix(".xlsx")
+output_csv = output_base.with_suffix(".csv")
 
 # ==== CATEGORY RULES ====
 CATEGORY_RULES = {
@@ -165,6 +167,7 @@ for finsta05 in root.findall(".//FINSTA05"):
 
 # ==== EXPORT ====
 df = pd.DataFrame(records)
-df.to_excel(output_file, index=False)
+df.to_excel(output_excel, index=False)
+df.to_csv(output_csv, index=False)
 
-print(f"Exported to {output_file}")
+print(f"Exported to {output_excel} and {output_csv}")
