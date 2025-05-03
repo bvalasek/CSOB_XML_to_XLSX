@@ -10,6 +10,9 @@ version-resolver:
     labels: [patch]
   default: patch
 
+include:
+  commits: true
+
 categories:
   - title: 🚀 Features
     labels:
@@ -26,17 +29,7 @@ categories:
       - build
       - ci
 
-change-template: '- $TITLE (#$NUMBER)'
-no-changes-template: '- Žiadne zmeny'
-
 template: |
   ## Changes
 
   $CHANGES
-
-include:
-  commits: true
-
-replacers:
-  - search: '/^## Changes\n\n\* No changes$/m'
-    replace: '## Changes\n\n* Update includes commits pushed directly to main.'
