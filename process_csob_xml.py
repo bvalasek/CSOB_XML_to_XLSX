@@ -153,8 +153,29 @@ for xml_file in xml_files:
 
     # ==== EXPORT ====
     df = pd.DataFrame(records)
-    summary = df.groupby("category")["transaction value"].sum().reset_index().sort_values("transaction value", ascending=False)
-    summary.columns = ["Category", "Total"]
+
+    summary = df.pivot_table(
+        index="category",
+        columns="type",
+        values="transaction value",
+        aggfunc="sum",
+        fill_value=0
+    ).reset_index()
+    summary.columns.name = None
+    summary["Net total"] = summary.get("income", 0) + summary.get("outcome", 0)
+
+    total_income = summary["income"].sum()
+    total_outcome = summary["outcome"].sum()
+    net_total = summary["Net total"].sum()
+
+    total_summary = pd.DataFrame({
+        "category": ["Total income", "Total outcome", "Net total"],
+        "income": [total_income, 0, total_income],
+        "outcome": [0, total_outcome, total_outcome],
+        "Net total": [total_income, total_outcome, net_total]
+    })
+
+    summary = pd.concat([summary, pd.DataFrame([{}]), total_summary], ignore_index=True)
 
     with pd.ExcelWriter(output_excel, engine="openpyxl") as writer:
         df.to_excel(writer, index=False, sheet_name="Transactions")
