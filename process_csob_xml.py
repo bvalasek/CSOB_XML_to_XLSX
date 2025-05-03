@@ -153,7 +153,13 @@ for xml_file in xml_files:
 
     # ==== EXPORT ====
     df = pd.DataFrame(records)
-    df.to_excel(output_excel, index=False)
+    summary = df.groupby("category")["transaction value"].sum().reset_index().sort_values("transaction value", ascending=False)
+    summary.columns = ["Category", "Total"]
+
+    with pd.ExcelWriter(output_excel, engine="openpyxl") as writer:
+        df.to_excel(writer, index=False, sheet_name="Transactions")
+        summary.to_excel(writer, index=False, sheet_name="Category Summary")
+
     df.to_csv(output_csv, index=False)
 
     print(f"Exported to {output_excel} and {output_csv}")
