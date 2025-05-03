@@ -30,3 +30,6 @@ template: |
   ## Changes
 
   $CHANGES
+
+include:
+  commits: true
