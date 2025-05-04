@@ -44,7 +44,9 @@ if custom_category_path:
             CATEGORY_RULES = json.load(f)
             print("Načítané vlastné kategórie zo súboru.")
     except Exception as e:
-        print(f"Chyba pri načítaní vlastných kategórií: {e}. Používajú sa predvolené.")
+        print(f"\u274c Chyba pri načítaní vlastných kategórií: {e}")
+        print("Skontroluj, či je JSON súbor správne naformátovaný a obsahuje platný slovník kategórií.")
+        print("Používajú sa predvolené kategórie.")
 
 xml_files = []
 if input_file.is_file() and input_file.suffix.lower() == ".xml":
