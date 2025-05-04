@@ -177,9 +177,12 @@ for xml_file in xml_files:
 
     summary = pd.concat([summary, pd.DataFrame([{}]), total_summary], ignore_index=True)
 
+    df_sorted = df.sort_values(by=["category", "transaction date"])
+
     with pd.ExcelWriter(output_excel, engine="openpyxl") as writer:
         df.to_excel(writer, index=False, sheet_name="Transactions")
         summary.to_excel(writer, index=False, sheet_name="Category Summary")
+        df_sorted.to_excel(writer, index=False, sheet_name="Transactions by Category")
 
     df.to_csv(output_csv, index=False)
 
