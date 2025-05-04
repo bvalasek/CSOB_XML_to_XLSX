@@ -2,11 +2,49 @@ import xml.etree.ElementTree as ET
 import pandas as pd
 from pathlib import Path
 import re
+import json
 
 # ==== SETTINGS ====
 input_path = input("Zadaj cestu k XML súboru alebo priečinku: ").strip()
 input_path = input_path.replace('\\', '').strip('"\'')
 input_file = Path(input_path)
+
+# Voliteľná cesta ku kategóriám
+custom_category_path = input("(Voliteľné) Zadaj cestu k súboru s vlastnými kategóriami (JSON): ").strip()
+custom_category_path = custom_category_path.replace('\\', '').strip('"\'')
+
+# ==== CATEGORY RULES ====
+CATEGORY_RULES = {
+    "Personal Loans": ["lesia dmytrenko"],
+    "Gifts": ["manufaktura", "dar", "donio"],
+    "Subscriptions": ["apple.com", "youtubepremium", "spotify", "budgetbakers", "chatgpt"],
+    "Income": ["dulovic michal", "infor"],
+    "Internal transfers": ["258867701/0300", "296660584/0300", "1522916037/3030", "revolut"],
+    "Groceries": ["tesco", "lidl", "albert", "billa", "rohlik", "košík", "kaufland", "spar", "penny", "coop", "potraviny", "paul"],
+    "Transport": ["čd", "pmdp", "bolt", "uber"],
+    "Dining": ["bbdomu", "mcdonald", "restaurace", "bistro", "kfc", "nesnezeno", "toogoodtogo", "pizza", "kebab", "jidelna", "beas", "dhaba", "pivstro", "fior di", "country life", "loving hut", "obederie"],
+    "Cafe (Study)": ["barcelounoc", "skautský", "cafe neustadt", "camp"],
+    "Cafe (Drinks)": ["friends bar", "lod riverside", "elpicko", "qcafe"],
+    "Bills": ["nájom", "elektrina", "plyn", "voda", "čez", "e.on", "pre", "yello", "mnd", "ppas"],
+    "Personal Care": ["dm", "rossmann", "teta", "drogerie", "kaderníctvo", "barber"],
+    "Medical bills": ["lekáreň", "doktor", "fyzioterapia", "dr. max"],
+    "Housing": ["ikea", "jysk", "bauhaus", "alza", "obi", "datart", "temu"],
+    "Clothing": ["hm", "lindex", "reserved", "new yorker", "3someconcept"],
+    "Insurance": ["pojišťovna", "životní pojištění"],
+    "Sport and Culture": ["vstupenky", "goout", "decathlon", "kino", "divadlo", "závody", "cinema city"],
+    "Telecommunication": ["o2", "vodafone", "upc"],
+    "ATM Withdrawals": ["atm", "ac01", "csas", "kb atm"],
+    "Investments": ["čsob drobné", "edward", "bohatství"]
+}
+
+# Ak existuje JSON súbor s kategóriami, načítaj ho
+if custom_category_path:
+    try:
+        with open(custom_category_path, "r", encoding="utf-8") as f:
+            CATEGORY_RULES = json.load(f)
+            print("Načítané vlastné kategórie zo súboru.")
+    except Exception as e:
+        print(f"Chyba pri načítaní vlastných kategórií: {e}. Používajú sa predvolené.")
 
 xml_files = []
 if input_file.is_file() and input_file.suffix.lower() == ".xml":
@@ -22,31 +60,6 @@ for xml_file in xml_files:
     output_excel = output_base.with_suffix(".xlsx")
     output_csv = output_base.with_suffix(".csv")
 
-    # ==== CATEGORY RULES ====
-    CATEGORY_RULES = {
-        "Personal Loans": ["lesia dmytrenko"],
-        "Gifts": ["manufaktura", "dar", "donio"],
-        "Subscriptions": ["apple.com", "youtubepremium", "spotify", "budgetbakers", "chatgpt"],
-        "Income": ["dulovic michal", "infor"],
-        "Internal transfers": ["258867701/0300", "296660584/0300", "1522916037/3030", "revolut"],
-        "Groceries": ["tesco", "lidl", "albert", "billa", "rohlik", "košík", "kaufland", "spar", "penny", "coop", "potraviny", "paul"],
-        "Transport": ["čd", "pmdp", "bolt", "uber"],
-        "Dining": ["bbdomu", "mcdonald", "restaurace", "bistro", "kfc", "nesnezeno", "toogoodtogo", "pizza", "kebab", "jidelna", "beas", "dhaba", "pivstro", "fior di", "country life", "loving hut", "obederie"],
-        "Cafe (Study)": ["barcelounoc", "skautský", "cafe neustadt", "camp"],
-        "Cafe (Drinks)": ["friends bar", "lod riverside", "elpicko", "qcafe"],
-        "Bills": ["nájom", "elektrina", "plyn", "voda", "čez", "e.on", "pre", "yello", "mnd", "ppas"],
-        "Personal Care": ["dm", "rossmann", "teta", "drogerie", "kaderníctvo", "barber"],
-        "Medical bills": ["lekáreň", "doktor", "fyzioterapia", "dr. max"],
-        "Housing": ["ikea", "jysk", "bauhaus", "alza", "obi", "datart", "temu"],
-        "Clothing": ["hm", "lindex", "reserved", "new yorker", "3someconcept"],
-        "Insurance": ["pojišťovna", "životní pojištění"],
-        "Sport and Culture": ["vstupenky", "goout", "decathlon", "kino", "divadlo", "závody", "cinema city"],
-        "Telecommunication": ["o2", "vodafone", "upc"],
-        "ATM Withdrawals": ["atm", "ac01", "csas", "kb atm"],
-        "Investments": ["čsob drobné", "edward", "bohatství"]
-    }
-
-    # ==== HELPER FUNCTIONS ====
     def translate_payment_type(cz_type):
         if not cz_type:
             return ""
@@ -82,7 +95,6 @@ for xml_file in xml_files:
                 return category
         return "Other"
 
-    # ==== PROCESS XML ====
     tree = ET.parse(xml_file)
     root = tree.getroot()
 
@@ -151,7 +163,6 @@ for xml_file in xml_files:
         }
         records.append(record)
 
-    # ==== EXPORT ====
     df = pd.DataFrame(records)
 
     summary = df.pivot_table(
