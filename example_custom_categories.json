@@ -1,0 +1,7 @@
+{
+  "Work Expenses": ["laptop", "conference", "coworking"],
+  "Health": ["vitamin", "doctor", "dentist", "pharmacy"],
+  "Leisure": ["cinema", "netflix", "spotify", "gaming"],
+  "Friends": ["gift", "drinks", "party"],
+  "Other": ["random", "misc", "unknown"]
+}
