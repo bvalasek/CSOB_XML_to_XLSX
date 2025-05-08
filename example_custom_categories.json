@@ -1,16 +1,21 @@
 {
   "accounts": {
-    "258867701/0300": "Internal transfers",
-    "296660584/0300": "Internal transfers",
-    "1522916037/3030": "Household Bills",
-    "280691466/0300": "Income"
+    "Internal transfers": [
+      "258867701/0300",
+      "296660584/0300"
+    ],
+    "Household Bills": [
+      "1522916037/3030"
+    ],
+    "Income": [
+      "280691466/0300"
+    ]
   },
   "categories": {
-"Income":["Dulovic","infor"], 
-    "Groceries": ["tesco", "lidl", "albert"],
-    "Dining": ["pizza", "kebab", "jidelna", "restaurant"],
-    "Subscriptions": ["spotify", "apple.com"],
+    "Groceries": ["tesco", "lidl", "albert", "billa"],
+    "Dining": ["pizza", "kebab", "restaurace", "jidelna"],
+    "Subscriptions": ["spotify", "netflix", "chatgpt"],
     "Gifts": ["manufaktura", "donio"],
-    "Medical": ["lekáreň", "doktor"]
+    "Medical bills": ["lekáreň", "doktor", "ordinace"]
   }
 }
