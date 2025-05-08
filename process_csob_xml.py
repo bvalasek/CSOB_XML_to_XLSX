@@ -37,7 +37,7 @@ CATEGORY_RULES = {
     "Investments": ["čsob drobné", "edward", "bohatství"]
 }
 
-ACCOUNT_CATEGORY_RULES = {}  # účet → kategória
+ACCOUNT_CATEGORY_RULES = {}  # kategória → zoznam účtov
 
 # Ak existuje JSON súbor s kategóriami, načítaj ho
 if custom_category_path:
@@ -99,8 +99,10 @@ for xml_file in xml_files:
 
     def categorize_transaction(text, from_account, to_account):
         account = from_account or to_account
-        if account and account in ACCOUNT_CATEGORY_RULES:
-            return ACCOUNT_CATEGORY_RULES[account]
+        if account:
+            for category, accounts in ACCOUNT_CATEGORY_RULES.items():
+                if account in accounts:
+                    return category
 
         text = text.lower()
         for category, keywords in CATEGORY_RULES.items():
