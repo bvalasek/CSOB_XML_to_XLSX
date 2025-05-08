@@ -48,10 +48,31 @@ if custom_category_path:
                 CATEGORY_RULES = data.get("categories", CATEGORY_RULES)
                 ACCOUNT_CATEGORY_RULES = data.get("accounts", ACCOUNT_CATEGORY_RULES)
                 print("Načítané vlastné kategórie a účty zo súboru.")
+
+                # === DODATOČNÁ VALIDÁCIA ===
+                # 1. Duplicitné účty vo viacerých kategóriách
+                account_to_category = {}
+                for category, account_list in ACCOUNT_CATEGORY_RULES.items():
+                    for acc in account_list:
+                        if acc in account_to_category:
+                            print(f"⚠️ Účet '{acc}' je priradený k viacerým kategóriám: '{account_to_category[acc]}' a '{category}'")
+                        else:
+                            account_to_category[acc] = category
+
+                # 2. Duplicitné kľúčové slová vo viacerých kategóriách
+                keyword_to_category = {}
+                for category, keyword_list in CATEGORY_RULES.items():
+                    for keyword in keyword_list:
+                        keyword_lc = keyword.lower()
+                        if keyword_lc in keyword_to_category:
+                            print(f"⚠️ Kľúčové slovo '{keyword}' je použité vo viacerých kategóriách: '{keyword_to_category[keyword_lc]}' a '{category}'")
+                        else:
+                            keyword_to_category[keyword_lc] = category
+
             else:
                 raise ValueError("JSON nie je slovník.")
     except Exception as e:
-        print(f"\u274c Chyba pri načítaní vlastných kategórií: {e}")
+        print(f"❌ Chyba pri načítaní vlastných kategórií: {e}")
         print("Skontroluj, či je JSON súbor správne naformátovaný a obsahuje platné sekcie 'categories' a/alebo 'accounts'.")
         print("Používajú sa predvolené kategórie.")
 
