@@ -1,7 +1,16 @@
 {
-  "Work Expenses": ["laptop", "conference", "coworking"],
-  "Health": ["vitamin", "doctor", "dentist", "pharmacy"],
-  "Leisure": ["cinema", "netflix", "spotify", "gaming"],
-  "Friends": ["gift", "drinks", "party"],
-  "Other": ["random", "misc", "unknown"]
+  "accounts": {
+    "258867701/0300": "Internal transfers",
+    "296660584/0300": "Internal transfers",
+    "1522916037/3030": "Household Bills",
+    "280691466/0300": "Income"
+  },
+  "categories": {
+"Income":["Dulovic","infor"], 
+    "Groceries": ["tesco", "lidl", "albert"],
+    "Dining": ["pizza", "kebab", "jidelna", "restaurant"],
+    "Subscriptions": ["spotify", "apple.com"],
+    "Gifts": ["manufaktura", "donio"],
+    "Medical": ["lekáreň", "doktor"]
+  }
 }

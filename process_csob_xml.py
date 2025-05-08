@@ -37,15 +37,22 @@ CATEGORY_RULES = {
     "Investments": ["čsob drobné", "edward", "bohatství"]
 }
 
+ACCOUNT_CATEGORY_RULES = {}  # účet → kategória
+
 # Ak existuje JSON súbor s kategóriami, načítaj ho
 if custom_category_path:
     try:
         with open(custom_category_path, "r", encoding="utf-8") as f:
-            CATEGORY_RULES = json.load(f)
-            print("Načítané vlastné kategórie zo súboru.")
+            data = json.load(f)
+            if isinstance(data, dict):
+                CATEGORY_RULES = data.get("categories", CATEGORY_RULES)
+                ACCOUNT_CATEGORY_RULES = data.get("accounts", ACCOUNT_CATEGORY_RULES)
+                print("Načítané vlastné kategórie a účty zo súboru.")
+            else:
+                raise ValueError("JSON nie je slovník.")
     except Exception as e:
         print(f"\u274c Chyba pri načítaní vlastných kategórií: {e}")
-        print("Skontroluj, či je JSON súbor správne naformátovaný a obsahuje platný slovník kategórií.")
+        print("Skontroluj, či je JSON súbor správne naformátovaný a obsahuje platné sekcie 'categories' a/alebo 'accounts'.")
         print("Používajú sa predvolené kategórie.")
 
 xml_files = []
@@ -90,11 +97,16 @@ for xml_file in xml_files:
 
         return cz_type
 
-    def categorize_transaction(text):
+    def categorize_transaction(text, from_account, to_account):
+        account = from_account or to_account
+        if account and account in ACCOUNT_CATEGORY_RULES:
+            return ACCOUNT_CATEGORY_RULES[account]
+
         text = text.lower()
         for category, keywords in CATEGORY_RULES.items():
             if any(keyword in text for keyword in keywords):
                 return category
+
         return "Other"
 
     tree = ET.parse(xml_file)
@@ -147,7 +159,7 @@ for xml_file in xml_files:
 
         place_or_location = f"{account} {place_cleaned}" if account and place_cleaned else account or place_cleaned
 
-        category = categorize_transaction(transaction_message)
+        category = categorize_transaction(transaction_message, from_account, to_account)
 
         record = {
             "transaction date": transaction_date,
