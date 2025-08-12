@@ -5,13 +5,24 @@
       "296660584/0300"
     ],
     "Income": [
-      "258867701/0300",  // tento účet je aj v Internal transfers
+      "258867701/0300",
       "1522916037/3030"
     ]
   },
   "categories": {
-    "Groceries": ["tesco", "lidl", "albert"],
-    "Dining": ["pizza", "kebab", "tesco"],  // "tesco" je aj v Groceries
-    "Medical": ["lekáreň", "doctor"]
+    "Groceries": [
+      "tesco",
+      "lidl",
+      "albert"
+    ],
+    "Dining": [
+      "pizza",
+      "kebab",
+      "tesco"
+    ],
+    "Medical": [
+      "lekáreň",
+      "doctor"
+    ]
   }
 }

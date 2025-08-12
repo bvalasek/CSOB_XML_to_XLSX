@@ -52,22 +52,34 @@ if custom_category_path:
                 # === DODATOČNÁ VALIDÁCIA ===
                 # 1. Duplicitné účty vo viacerých kategóriách
                 account_to_category = {}
+                duplicate_accounts = []
                 for category, account_list in ACCOUNT_CATEGORY_RULES.items():
                     for acc in account_list:
                         if acc in account_to_category:
-                            print(f"⚠️ Účet '{acc}' je priradený k viacerým kategóriám: '{account_to_category[acc]}' a '{category}'")
+                            duplicate_accounts.append((acc, account_to_category[acc], category))
                         else:
                             account_to_category[acc] = category
 
+                if duplicate_accounts:
+                    print("⚠️ Zistené konflikty v účtových kategóriách:")
+                    for acc, cat1, cat2 in duplicate_accounts:
+                        print(f"  - Účet '{acc}' patrí do '{cat1}' aj '{cat2}'")
+
                 # 2. Duplicitné kľúčové slová vo viacerých kategóriách
                 keyword_to_category = {}
+                duplicate_keywords = []
                 for category, keyword_list in CATEGORY_RULES.items():
                     for keyword in keyword_list:
                         keyword_lc = keyword.lower()
                         if keyword_lc in keyword_to_category:
-                            print(f"⚠️ Kľúčové slovo '{keyword}' je použité vo viacerých kategóriách: '{keyword_to_category[keyword_lc]}' a '{category}'")
+                            duplicate_keywords.append((keyword, keyword_to_category[keyword_lc], category))
                         else:
                             keyword_to_category[keyword_lc] = category
+
+                if duplicate_keywords:
+                    print("⚠️ Zistené konflikty v kľúčových slovách kategórií:")
+                    for word, cat1, cat2 in duplicate_keywords:
+                        print(f"  - Kľúčové slovo '{word}' patrí do '{cat1}' aj '{cat2}'")
 
             else:
                 raise ValueError("JSON nie je slovník.")
