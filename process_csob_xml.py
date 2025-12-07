@@ -2,11 +2,91 @@ import xml.etree.ElementTree as ET
 import pandas as pd
 from pathlib import Path
 import re
+import json
 
 # ==== SETTINGS ====
 input_path = input("Zadaj cestu k XML súboru alebo priečinku: ").strip()
 input_path = input_path.replace('\\', '').strip('"\'')
 input_file = Path(input_path)
+
+# Voliteľná cesta ku kategóriám
+custom_category_path = input("(Voliteľné) Zadaj cestu k súboru s vlastnými kategóriami (JSON): ").strip()
+custom_category_path = custom_category_path.replace('\\', '').strip('"\'')
+
+# ==== CATEGORY RULES ====
+CATEGORY_RULES = {
+    "Personal Loans": ["lesia dmytrenko"],
+    "Gifts": ["manufaktura", "dar", "donio"],
+    "Subscriptions": ["apple.com", "youtubepremium", "spotify", "budgetbakers", "chatgpt"],
+    "Income": ["dulovic michal", "infor"],
+    "Internal transfers": ["258867701/0300", "296660584/0300", "1522916037/3030", "revolut"],
+    "Groceries": ["tesco", "lidl", "albert", "billa", "rohlik", "košík", "kaufland", "spar", "penny", "coop", "potraviny", "paul"],
+    "Transport": ["čd", "pmdp", "bolt", "uber"],
+    "Dining": ["bbdomu", "mcdonald", "restaurace", "bistro", "kfc", "nesnezeno", "toogoodtogo", "pizza", "kebab", "jidelna", "beas", "dhaba", "pivstro", "fior di", "country life", "loving hut", "obederie"],
+    "Cafe (Study)": ["barcelounoc", "skautský", "cafe neustadt", "camp"],
+    "Cafe (Drinks)": ["friends bar", "lod riverside", "elpicko", "qcafe"],
+    "Bills": ["nájom", "elektrina", "plyn", "voda", "čez", "e.on", "pre", "yello", "mnd", "ppas"],
+    "Personal Care": ["dm", "rossmann", "teta", "drogerie", "kaderníctvo", "barber"],
+    "Medical bills": ["lekáreň", "doktor", "fyzioterapia", "dr. max"],
+    "Housing": ["ikea", "jysk", "bauhaus", "alza", "obi", "datart", "temu"],
+    "Clothing": ["hm", "lindex", "reserved", "new yorker", "3someconcept"],
+    "Insurance": ["pojišťovna", "životní pojištění"],
+    "Sport and Culture": ["vstupenky", "goout", "decathlon", "kino", "divadlo", "závody", "cinema city"],
+    "Telecommunication": ["o2", "vodafone", "upc"],
+    "ATM Withdrawals": ["atm", "ac01", "csas", "kb atm"],
+    "Investments": ["čsob drobné", "edward", "bohatství"]
+}
+
+ACCOUNT_CATEGORY_RULES = {}  # kategória → zoznam účtov
+
+# Ak existuje JSON súbor s kategóriami, načítaj ho
+if custom_category_path:
+    try:
+        with open(custom_category_path, "r", encoding="utf-8") as f:
+            data = json.load(f)
+            if isinstance(data, dict):
+                CATEGORY_RULES = data.get("categories", CATEGORY_RULES)
+                ACCOUNT_CATEGORY_RULES = data.get("accounts", ACCOUNT_CATEGORY_RULES)
+                print("Načítané vlastné kategórie a účty zo súboru.")
+
+                # === DODATOČNÁ VALIDÁCIA ===
+                # 1. Duplicitné účty vo viacerých kategóriách
+                account_to_category = {}
+                duplicate_accounts = []
+                for category, account_list in ACCOUNT_CATEGORY_RULES.items():
+                    for acc in account_list:
+                        if acc in account_to_category:
+                            duplicate_accounts.append((acc, account_to_category[acc], category))
+                        else:
+                            account_to_category[acc] = category
+
+                if duplicate_accounts:
+                    print("⚠️ Zistené konflikty v účtových kategóriách:")
+                    for acc, cat1, cat2 in duplicate_accounts:
+                        print(f"  - Účet '{acc}' patrí do '{cat1}' aj '{cat2}'")
+
+                # 2. Duplicitné kľúčové slová vo viacerých kategóriách
+                keyword_to_category = {}
+                duplicate_keywords = []
+                for category, keyword_list in CATEGORY_RULES.items():
+                    for keyword in keyword_list:
+                        keyword_lc = keyword.lower()
+                        if keyword_lc in keyword_to_category:
+                            duplicate_keywords.append((keyword, keyword_to_category[keyword_lc], category))
+                        else:
+                            keyword_to_category[keyword_lc] = category
+
+                if duplicate_keywords:
+                    print("⚠️ Zistené konflikty v kľúčových slovách kategórií:")
+                    for word, cat1, cat2 in duplicate_keywords:
+                        print(f"  - Kľúčové slovo '{word}' patrí do '{cat1}' aj '{cat2}'")
+
+            else:
+                raise ValueError("JSON nie je slovník.")
+    except Exception as e:
+        print(f"❌ Chyba pri načítaní vlastných kategórií: {e}")
+        print("Skontroluj, či je JSON súbor správne naformátovaný a obsahuje platné sekcie 'categories' a/alebo 'accounts'.")
+        print("Používajú sa predvolené kategórie.")
 
 xml_files = []
 if input_file.is_file() and input_file.suffix.lower() == ".xml":
@@ -22,31 +102,6 @@ for xml_file in xml_files:
     output_excel = output_base.with_suffix(".xlsx")
     output_csv = output_base.with_suffix(".csv")
 
-    # ==== CATEGORY RULES ====
-    CATEGORY_RULES = {
-        "Personal Loans": ["lesia dmytrenko"],
-        "Gifts": ["manufaktura", "dar", "donio"],
-        "Subscriptions": ["apple.com", "youtubepremium", "spotify", "budgetbakers", "chatgpt"],
-        "Income": ["dulovic michal", "infor"],
-        "Internal transfers": ["258867701/0300", "296660584/0300", "1522916037/3030", "revolut"],
-        "Groceries": ["tesco", "lidl", "albert", "billa", "rohlik", "košík", "kaufland", "spar", "penny", "coop", "potraviny", "paul"],
-        "Transport": ["čd", "pmdp", "bolt", "uber"],
-        "Dining": ["bbdomu", "mcdonald", "restaurace", "bistro", "kfc", "nesnezeno", "toogoodtogo", "pizza", "kebab", "jidelna", "beas", "dhaba", "pivstro", "fior di", "country life", "loving hut", "obederie"],
-        "Cafe (Study)": ["barcelounoc", "skautský", "cafe neustadt", "camp"],
-        "Cafe (Drinks)": ["friends bar", "lod riverside", "elpicko", "qcafe"],
-        "Bills": ["nájom", "elektrina", "plyn", "voda", "čez", "e.on", "pre", "yello", "mnd", "ppas"],
-        "Personal Care": ["dm", "rossmann", "teta", "drogerie", "kaderníctvo", "barber"],
-        "Medical bills": ["lekáreň", "doktor", "fyzioterapia", "dr. max"],
-        "Housing": ["ikea", "jysk", "bauhaus", "alza", "obi", "datart", "temu"],
-        "Clothing": ["hm", "lindex", "reserved", "new yorker", "3someconcept"],
-        "Insurance": ["pojišťovna", "životní pojištění"],
-        "Sport and Culture": ["vstupenky", "goout", "decathlon", "kino", "divadlo", "závody", "cinema city"],
-        "Telecommunication": ["o2", "vodafone", "upc"],
-        "ATM Withdrawals": ["atm", "ac01", "csas", "kb atm"],
-        "Investments": ["čsob drobné", "edward", "bohatství"]
-    }
-
-    # ==== HELPER FUNCTIONS ====
     def translate_payment_type(cz_type):
         if not cz_type:
             return ""
@@ -75,14 +130,20 @@ for xml_file in xml_files:
 
         return cz_type
 
-    def categorize_transaction(text):
+    def categorize_transaction(text, from_account, to_account):
+        account = from_account or to_account
+        if account:
+            for category, accounts in ACCOUNT_CATEGORY_RULES.items():
+                if account in accounts:
+                    return category
+
         text = text.lower()
         for category, keywords in CATEGORY_RULES.items():
             if any(keyword in text for keyword in keywords):
                 return category
+
         return "Other"
 
-    # ==== PROCESS XML ====
     tree = ET.parse(xml_file)
     root = tree.getroot()
 
@@ -133,7 +194,7 @@ for xml_file in xml_files:
 
         place_or_location = f"{account} {place_cleaned}" if account and place_cleaned else account or place_cleaned
 
-        category = categorize_transaction(transaction_message)
+        category = categorize_transaction(transaction_message, from_account, to_account)
 
         record = {
             "transaction date": transaction_date,
@@ -151,7 +212,6 @@ for xml_file in xml_files:
         }
         records.append(record)
 
-    # ==== EXPORT ====
     df = pd.DataFrame(records)
 
     summary = df.pivot_table(

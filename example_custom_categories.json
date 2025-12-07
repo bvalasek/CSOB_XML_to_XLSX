@@ -1,0 +1,21 @@
+{
+  "accounts": {
+    "Internal transfers": [
+      "258867701/0300",
+      "296660584/0300"
+    ],
+    "Household Bills": [
+      "1522916037/3030"
+    ],
+    "Income": [
+      "280691466/0300"
+    ]
+  },
+  "categories": {
+    "Groceries": ["tesco", "lidl", "albert", "billa"],
+    "Dining": ["pizza", "kebab", "restaurace", "jidelna"],
+    "Subscriptions": ["spotify", "netflix", "chatgpt"],
+    "Gifts": ["manufaktura", "donio"],
+    "Medical bills": ["lekáreň", "doktor", "ordinace"]
+  }
+}
